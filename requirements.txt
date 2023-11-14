@@ -1,0 +1,10 @@
+jax
+jaxlib
+equinox
+gymnax
+pyrootutils
+wandb
+plotly
+distrax
+optax
+brax
