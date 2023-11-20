@@ -1,0 +1,8 @@
+name: reinforce
+
+policy:
+  _target_: networks.nets.CategoricalPolicy
+  obs_dim: ${env.obs_dim}
+  action_dim: ${env.action_dim}
+  hidden_dims: [256, 256]
+  key: ${random_key}

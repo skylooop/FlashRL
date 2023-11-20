@@ -1,0 +1,260 @@
+{
+    "os": "Linux-4.15.0-50-generic-x86_64-with-glibc2.27",
+    "python": "3.9.18",
+    "heartbeatAt": "2023-11-20T10:52:09.127277",
+    "startedAt": "2023-11-20T10:52:08.966249",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/m_bobrin/FlashRL/OnlineRL/reinforce.py",
+    "codePathLocal": "OnlineRL/reinforce.py",
+    "codePath": "OnlineRL/reinforce.py",
+    "git": {
+        "remote": "https://github.com/skylooop/FlashRL.git",
+        "commit": "e448d4f1532f75071bff8a17a1a5ccd98358f427"
+    },
+    "email": "maksim.bobrin@skoltech.ru",
+    "root": "/home/m_bobrin/FlashRL",
+    "host": "skoltech-DGX-Station",
+    "username": "m_bobrin",
+    "executable": "/home/m_bobrin/anaconda3/envs/flashrl/bin/python",
+    "cpu_count": 20,
+    "cpu_count_logical": 40,
+    "cpu_freq": {
+        "current": 1320.2259499999998,
+        "min": 1200.0,
+        "max": 3600.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1199.352,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1198.909,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.316,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1399.258,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1298.177,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1300.446,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1400.006,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1304.914,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1398.773,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1470.453,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.252,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1198.99,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1297.707,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1198.865,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1400.153,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1901.972,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.366,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1197.871,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.432,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1502.501,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.366,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1196.911,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1200.863,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1393.927,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1302.819,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1297.854,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1399.497,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1298.507,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1397.7,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1425.125,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1200.057,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1198.942,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1300.013,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.366,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1400.114,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1905.211,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.366,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1200.409,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1199.936,
+            "min": 1200.0,
+            "max": 3600.0
+        },
+        {
+            "current": 1502.167,
+            "min": 1200.0,
+            "max": 3600.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 1759.8377494812012,
+            "used": 1305.943202972412
+        }
+    },
+    "gpu": "Tesla V100-DGXS-16GB",
+    "gpu_count": 4,
+    "gpu_devices": [
+        {
+            "name": "Tesla V100-DGXS-16GB",
+            "memory_total": 17179869184
+        },
+        {
+            "name": "Tesla V100-DGXS-16GB",
+            "memory_total": 17179869184
+        },
+        {
+            "name": "Tesla V100-DGXS-16GB",
+            "memory_total": 17179869184
+        },
+        {
+            "name": "Tesla V100-DGXS-16GB",
+            "memory_total": 17179869184
+        }
+    ],
+    "memory": {
+        "total": 251.821044921875
+    }
+}

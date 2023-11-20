@@ -1,0 +1,44 @@
+wandb_version: 1
+
+project_name:
+  desc: null
+  value: FlashRL
+group:
+  desc: null
+  value: reinforce
+algo:
+  desc: null
+  value: '{''name'': ''reinforce'', ''_target_'': ''networks.nets.GaussianPolicy'',
+    ''obs_dim'': ''${env.obs_dim}'', ''action_dim'': ''${env.action_dim}'', ''hidden_dims'':
+    [256, 256]}'
+env:
+  desc: null
+  value: '{''obs_dim'': 4, ''action_dim'': 2}'
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.18
+    cli_version: 0.16.0
+    is_jupyter_run: false
+    is_kaggle_kernel: true
+    start_time: 1700394955.359492
+    t:
+      1:
+      - 12
+      - 45
+      - 50
+      - 55
+      2:
+      - 12
+      - 45
+      - 50
+      - 55
+      3:
+      - 16
+      - 23
+      4: 3.9.18
+      5: 0.16.0
+      8:
+      - 2
+      - 5
+      13: linux-x86_64
