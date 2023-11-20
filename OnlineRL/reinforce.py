@@ -11,6 +11,7 @@ import equinox as eqx
 import jax
 import optax
 
+from networks.nets import CategoricalPolicy
 from tqdm.auto import tqdm
 
 import wandb
@@ -24,10 +25,7 @@ from networks.base_eqx import TrainState
 from utils.wandb_logger import setup_wandb
 
 
-def policy_step(model, input, keys):
-    return model(input).sample(seed=keys)
-
-@functools.partial(eqx.filter_pmap, in_axes=(None, 0, None))
+@functools.partial(eqx.filter_pmap, in_axes=(None, 0, 0))
 def per_epoch_update(key, scan_out, train_state):
     obs, action, reward, next_obs, done = scan_out
     
@@ -50,18 +48,21 @@ def per_epoch_update(key, scan_out, train_state):
     train_state = train_state.apply_updates(grads)
     return train_state, val_loss
 
-@functools.partial(eqx.filter_pmap, in_axes=(0, None, None, None, None))
-def rollout(key, env, train_state, episode_steps, cfg):
+@functools.partial(eqx.filter_pmap, in_axes=(0, None, 0, None, None))
+def rollout(key, env, model, episode_steps, cfg):
     env, env_params = env
     key, sample_key, step_key, reset_key = jax.random.split(key, 4)
     
     vmap_step_keys = jax.random.split(step_key, cfg.num_environments)
     vmap_reset_keys = jax.random.split(reset_key, cfg.num_environments)
 
+    def policy_step(model, input, keys):
+        return model(input).sample(seed=keys)
+    
     vmap_step = jax.vmap(env.step, in_axes=(0, 0, 0))
     vmap_action = eqx.filter_vmap(policy_step, in_axes=(None, 0, 0))
     obs, state = jax.vmap(env.reset, in_axes=(0, None))(vmap_reset_keys, env_params)
-    init_policy_params, init_policy_static = eqx.partition(train_state.model, eqx.is_array)
+    init_policy_params, init_policy_static = eqx.partition(model, eqx.is_array)
     
     def rollout(carry, xs):
         policy_params, obs, state, sample_key = carry
@@ -82,17 +83,14 @@ def rollout(key, env, train_state, episode_steps, cfg):
 def train(env: tuple, train_state: TrainState, cfg: DictConfig, rng: jax.Array):
     epochs, episode_steps = cfg.epochs, cfg.episode_steps
     
-    # def ensemblize_model(keys):
-        
-    
-    for epoch in tqdm(range(epochs + 1), leave=True, desc="Epoch"):
+    for epoch in tqdm(range(epochs), leave=True, desc="Epoch"):
         rng, old_key = jax.random.split(rng, 2)
         key = jax.random.split(rng, 4)
-        scan_out = rollout(key, env, train_state, episode_steps, cfg) # note that shape is (NUM_DEVICES, NUM_EPISODES, NUM_ENV)
+        scan_out = rollout(key, env, train_state.model, episode_steps, cfg) # note that shape is (NUM_DEVICES, NUM_EPISODES, NUM_ENV)
         train_state, info = per_epoch_update(key, scan_out, train_state)
-        unensemble_model = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.model)
-        unensemble_state = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.optim_state)
-        train_state = dataclasses.replace(train_state, model=unensemble_model, optim_state=unensemble_state)
+        # unensemble_model = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.model)
+        # unensemble_state = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.optim_state)
+        # train_state = dataclasses.replace(train_state, model=unensemble_model, optim_state=unensemble_state)
         print(((scan_out[2].sum(axis=1)) / scan_out[-1].sum(axis=1)).mean(-1).mean())
         
         # info = jax.tree_util.tree_map(lambda v: v.item() / episode_steps, info)
@@ -113,10 +111,19 @@ def main(cfg: DictConfig):
     logger.info(OmegaConf.to_yaml(cfg))
     setup_wandb(config=cfg)
     
-    key, init_key = jax.random.split(jax.random.PRNGKey(42))
+    key, init_key = jax.random.split(jax.random.PRNGKey(cfg.random_key), 2)
     env = tuple(gymnax.make(cfg.env.name)) # returns env, env_params
     
-    train_state = TrainState.create(model=hydra.utils.instantiate(cfg.algo.policy), optim=optax.adam(learning_rate=3e-4))
+    @eqx.filter_vmap
+    def ensemblize_model(keys):
+        return TrainState.create(model=CategoricalPolicy(obs_dim=4, action_dim=2, hidden_dims=[256, 256], key=keys),
+                                 optim=optax.adam(learning_rate=3e-4))
+        #return CategoricalPolicy(obs_dim=4, action_dim=2, hidden_dims=[256, 256], key=keys) 
+    
+    train_state = ensemblize_model(jax.random.split(key, cfg.num_devices))
+    # model=hydra.utils.instantiate(cfg.algo.policy)
+    # train_state = TrainState.create(model=ensemblize_model(jax.random.split(key, cfg.num_devices)),
+    #                                 optim=optax.adam(learning_rate=3e-4))
     
     train(env, train_state, cfg, init_key)
         

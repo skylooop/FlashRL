@@ -27,8 +27,8 @@ class GaussianPolicy(eqx.Module):
 class CategoricalPolicy(eqx.Module):
     net: eqx.Module
     
-    def __init__(self, obs_dim: int, action_dim: int, hidden_dims:list, key: int):
-        net_key, key = jax.random.split(jax.random.PRNGKey(key), 2)
+    def __init__(self, obs_dim: int, action_dim: int, hidden_dims:list, key: jax.Array):
+        net_key, key = jax.random.split(key, 2)
         
         self.net = eqxnn.MLP(in_size=obs_dim, out_size=action_dim, width_size=hidden_dims[0],
                              depth=len(hidden_dims), activation=jax.nn.gelu, key=net_key)
