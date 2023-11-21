@@ -16,14 +16,13 @@ from tqdm.auto import tqdm
 
 import wandb
 import functools
-import dataclasses
 from omegaconf import OmegaConf, DictConfig
 import logging
 
 # Some custom utilities & Networks
 from networks.base_eqx import TrainState
 from utils.wandb_logger import setup_wandb
-
+from utils.viz import TqdmExtraFormat
 
 @functools.partial(eqx.filter_pmap, in_axes=(None, 0, 0))
 def per_epoch_update(key, scan_out, train_state):
@@ -88,24 +87,29 @@ def train(env: tuple, train_state: TrainState, cfg: DictConfig, rng: jax.Array):
         key = jax.random.split(rng, 4)
         scan_out = rollout(key, env, train_state.model, episode_steps, cfg) # note that shape is (NUM_DEVICES, NUM_EPISODES, NUM_ENV)
         train_state, info = per_epoch_update(key, scan_out, train_state)
-        # unensemble_model = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.model)
-        # unensemble_state = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.optim_state)
-        # train_state = dataclasses.replace(train_state, model=unensemble_model, optim_state=unensemble_state)
-        print(((scan_out[2].sum(axis=1)) / scan_out[-1].sum(axis=1)).mean(-1).mean())
+        reward_info = ((scan_out[2].sum(axis=1)) / scan_out[-1].sum(axis=1)).mean(-1).mean()
         
-        # info = jax.tree_util.tree_map(lambda v: v.item() / episode_steps, info)
-        # wandb.log({"epoch": epoch, **info})
-        
-        # if epoch % cfg.eval_every == 0 or epoch == epochs:
-        #     eval_returns = evaluate(eval_env, actor.model, config.eval_episodes, seed=config.eval_seed)
+        wandb.log({f"Reward across {cfg.num_environments} envs": reward_info})
 
-        #     wandb.log({
-        #         "epoch": epoch,
-        #         "eval/normalized_score_mean": ,
-        #         "eval/normalized_score_std": 
-        #     })
-    
-
+        if epoch == cfg.epochs-1:            
+            import gym
+            from gym.utils import save_video
+            env = gym.make(cfg.env.name, render_mode="rgb_array")
+            observation, info = env.reset()
+            done = False
+            frames = []
+            single_model = jax.tree_util.tree_map(lambda x: x[0] if eqx.is_array(x) else x, train_state.model)
+            
+            for i in range(500):
+                rng, sample_key = jax.random.split(rng, 2)
+                action = single_model(observation).sample(seed=rng)
+                observation, reward, terminated, truncated, info = env.step(jax.device_get(action))
+                frames.append(env.render())
+                done = terminated or truncated
+                if done:
+                    observation, info = env.reset()
+            save_video.save_video(frames, video_folder="videos", fps=env.metadata["render_fps"])
+            
 @hydra.main(version_base="1.4", config_path=str(ROOT) + "/OnlineRL/configs", config_name="base.yaml")
 def main(cfg: DictConfig):
     logger.info(OmegaConf.to_yaml(cfg))
@@ -118,7 +122,6 @@ def main(cfg: DictConfig):
     def ensemblize_model(keys):
         return TrainState.create(model=CategoricalPolicy(obs_dim=4, action_dim=2, hidden_dims=[256, 256], key=keys),
                                  optim=optax.adam(learning_rate=3e-4))
-        #return CategoricalPolicy(obs_dim=4, action_dim=2, hidden_dims=[256, 256], key=keys) 
     
     train_state = ensemblize_model(jax.random.split(key, cfg.num_devices))
     # model=hydra.utils.instantiate(cfg.algo.policy)

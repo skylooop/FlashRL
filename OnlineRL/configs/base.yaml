@@ -5,15 +5,15 @@ defaults:
   - algo: reinforce
   - env : cartpole
 
-  # - override hydra/job_logging: colorlog
-  # - override hydra/hydra_logging: colorlog
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
 
 project_name: FlashRL
 group: ${algo.name}
 
 random_key: 42
-episode_steps: 5_00
-epochs: 1_000
+episode_steps: 500
+epochs: 150
 eval_every: 1_000
 
 # Leveraging GPU-based environments
